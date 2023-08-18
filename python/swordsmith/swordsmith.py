@@ -54,7 +54,7 @@ class Crossword:
         # update wordset
         if old_word in self.wordset and len(old_word) > 1:
             self.wordset.remove(old_word)
-        if self.is_word_filled(new_word) and len(new_word) > 1:
+        if len(new_word) > 1 and self.is_word_filled(new_word):
             self.wordset.add(new_word)
         
         # update words for just this slot, not crossing slots
@@ -69,9 +69,9 @@ class Crossword:
         
         # place word in words map and wordset
         self.words[slot] = word
-        if self.is_word_filled(prev_word) and len(prev_word) > 1:
+        if len(prev_word) > 1 and self.is_word_filled(prev_word):
             self.wordset.remove(prev_word)
-        if self.is_word_filled(word) and len(word) > 1:
+        if len(word) > 1 and self.is_word_filled(word):
             self.wordset.add(word)
         
         # update crossing words
@@ -219,11 +219,12 @@ class AmericanCrossword(Crossword):
 
     def __generate_slots_from_grid(self):
         self.clear()
+        halfCols = int(self.cols/2)
         # generate across words
         for r in range(self.rows):
             word = ''
             squares = []
-            for c in range(self.cols):
+            for c in range(halfCols):
                 letter = self.grid[r][c]
                 if letter == EMPTY:
                     # add a letter to the current word
@@ -233,7 +234,7 @@ class AmericanCrossword(Crossword):
                     # add two letters to the current word
                     word += ".."
                     squares.append((r, c))
-                    squares.append((r, c+ int(self.cols/2)))
+                    squares.append((r, c+ halfCols))
                 else:
                     # block hit, check to see if there's a word in progress
                     if word != '' and len(word) > 1:
@@ -245,7 +246,7 @@ class AmericanCrossword(Crossword):
                 self.__add_slot(squares, word)
 
         # generate down words
-        for c in range(self.cols):
+        for c in range(halfCols):
             word = ''
             squares = []
             for r in range(self.rows):
@@ -258,7 +259,7 @@ class AmericanCrossword(Crossword):
                     # add two letters to the current word
                     word += ".."
                     squares.append((r, c))
-                    squares.append((r, c+ int(self.cols/2)))
+                    squares.append((r, c+ halfCols))
                 else:
                     # block hit, check to see if there's a word in progress
                     if word != '':
