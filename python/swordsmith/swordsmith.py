@@ -83,6 +83,11 @@ class Crossword:
 
             self.__put_letter_in_slot(word[index], crossing_slot, crossing_index)
 
+            # This is a really hacky way to make sure it takes care of two-square rebuses but it works
+            if len(set(slot).intersection(set(crossing_slot))) == 2:
+                self.__put_letter_in_slot(word[index-1], crossing_slot, crossing_index-1)
+
+
     def is_dupe(self, word):
         """Returns whether or not a given word is already in the grid"""
         return word in self.wordset
@@ -204,9 +209,13 @@ class AmericanCrossword(Crossword):
         
         self.words[slot] = word
 
-        # print(self.slots)
-        # print(self.words)
-        # print("\n")
+        #for slot in self.slots:
+        #    print(slot)
+        #print("NOW WORDS")
+        #print(self.words)
+        #for word in self.words:
+        #    print(word)
+        #print("*********")
 
     def __generate_slots_from_grid(self):
         self.clear()
@@ -228,7 +237,7 @@ class AmericanCrossword(Crossword):
                     squares.append((r, c+4))
                 else:
                     # block hit, check to see if there's a word in progress
-                    if word != '':
+                    if word != '' and len(word) > 1:
                         self.__add_slot(squares, word)
                         word = ''
                         squares = []
@@ -316,7 +325,7 @@ class Wordlist:
             return self.pattern_matches[pattern]
         
         length = len(pattern)
-        indices = [self.indices[length][i][letter] for i, letter in enumerate(pattern) if letter != EMPTY]
+        indices = [self.indices[length][i][letter] for i, letter in enumerate(pattern) if (letter != EMPTY) and (letter != REBUS)]
         if indices:
             matches = set.intersection(*indices)
         else:
@@ -337,6 +346,8 @@ class Filler(ABC):
         """Returns list of new words that cross the given slot, given a word to theoretically put in the slot. Excludes slots that were already filled"""
         new_crossing_words = []
 
+        # print(slot, word, crossword.crossings[slot])
+
         for crossing_slot in crossword.crossings[slot]:
             square = crossword.crossings[slot][crossing_slot]
             index = crossword.squares[square][slot]
@@ -352,6 +363,8 @@ class Filler(ABC):
                 continue
 
             new_crossing_words.append(new_crossing_word)
+
+        #print(slot, word, new_crossing_words)
         
         return new_crossing_words
     
