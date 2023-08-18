@@ -219,7 +219,6 @@ class AmericanCrossword(Crossword):
 
     def __generate_slots_from_grid(self):
         self.clear()
-        print(self.cols)
         # generate across words
         for r in range(self.rows):
             word = ''
