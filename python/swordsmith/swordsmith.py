@@ -10,7 +10,8 @@ from random import shuffle
 from collections import defaultdict
 
 EMPTY = '.'
-BLOCK = ' '
+BLOCK = '*'
+REBUS = "?"
 
 class Crossword:
     def __init__(self):
@@ -51,9 +52,9 @@ class Crossword:
         new_word = old_word[0:i] + letter + old_word[i+1:]
 
         # update wordset
-        if old_word in self.wordset:
+        if old_word in self.wordset and len(old_word) > 1:
             self.wordset.remove(old_word)
-        if self.is_word_filled(new_word):
+        if self.is_word_filled(new_word) and len(new_word) > 1:
             self.wordset.add(new_word)
         
         # update words for just this slot, not crossing slots
@@ -68,9 +69,9 @@ class Crossword:
         
         # place word in words map and wordset
         self.words[slot] = word
-        if self.is_word_filled(prev_word):
+        if self.is_word_filled(prev_word) and len(prev_word) > 1:
             self.wordset.remove(prev_word)
-        if self.is_word_filled(word):
+        if self.is_word_filled(word) and len(word) > 1:
             self.wordset.add(word)
         
         # update crossing words
@@ -88,6 +89,9 @@ class Crossword:
 
     def is_filled(self):
         """Returns whether or not the whole crossword is filled"""
+        # Print the words we get in the filled crossword
+        if all(Crossword.is_word_filled(word) for word in self.words.values()):
+            print("FILLED", self.words.values())
         return all(Crossword.is_word_filled(word) for word in self.words.values())
     
     @staticmethod
@@ -200,6 +204,10 @@ class AmericanCrossword(Crossword):
         
         self.words[slot] = word
 
+        # print(self.slots)
+        # print(self.words)
+        # print("\n")
+
     def __generate_slots_from_grid(self):
         self.clear()
 
@@ -209,10 +217,15 @@ class AmericanCrossword(Crossword):
             squares = []
             for c in range(self.cols):
                 letter = self.grid[r][c]
-                if letter != BLOCK:
+                if letter == EMPTY:
                     # add a letter to the current word
                     word += letter
                     squares.append((r, c))
+                elif letter == REBUS:
+                    # add two letters to the current word
+                    word += ".."
+                    squares.append((r, c))
+                    squares.append((r, c+4))
                 else:
                     # block hit, check to see if there's a word in progress
                     if word != '':
@@ -220,7 +233,7 @@ class AmericanCrossword(Crossword):
                         word = ''
                         squares = []
             # last word in row
-            if word != '':
+            if word != '' and len(word) > 1:
                 self.__add_slot(squares, word)
 
         # generate down words
@@ -229,10 +242,15 @@ class AmericanCrossword(Crossword):
             squares = []
             for r in range(self.rows):
                 letter = self.grid[r][c]
-                if letter != BLOCK:
+                if letter == EMPTY:
                     # add a letter to the current word
                     word += letter
                     squares.append((r, c))
+                elif letter == REBUS:
+                    # add two letters to the current word
+                    word += ".."
+                    squares.append((r, c))
+                    squares.append((r, c+4))
                 else:
                     # block hit, check to see if there's a word in progress
                     if word != '':
