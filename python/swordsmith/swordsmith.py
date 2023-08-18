@@ -219,7 +219,7 @@ class AmericanCrossword(Crossword):
 
     def __generate_slots_from_grid(self):
         self.clear()
-
+        print(self.cols)
         # generate across words
         for r in range(self.rows):
             word = ''
@@ -234,7 +234,7 @@ class AmericanCrossword(Crossword):
                     # add two letters to the current word
                     word += ".."
                     squares.append((r, c))
-                    squares.append((r, c+4))
+                    squares.append((r, c+ int(self.cols/2)))
                 else:
                     # block hit, check to see if there's a word in progress
                     if word != '' and len(word) > 1:
@@ -259,7 +259,7 @@ class AmericanCrossword(Crossword):
                     # add two letters to the current word
                     word += ".."
                     squares.append((r, c))
-                    squares.append((r, c+4))
+                    squares.append((r, c+ int(self.cols/2)))
                 else:
                     # block hit, check to see if there's a word in progress
                     if word != '':
