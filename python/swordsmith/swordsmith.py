@@ -724,6 +724,9 @@ def run_test(args):
         tic = time.time()
 
         crossword = AmericanCrossword.from_grid(grid)
+
+        crossword.put_word("STUFFEDCRUST", ((9,5), (9,6), (9,7), (9,8), (9,9), (9,10), (9,11), (9,12), (9,13), (9,14), (9,15), (9,31)))
+
         filler = get_filler(args)
 
         filler.fill(crossword, wordlist, args.animate)
