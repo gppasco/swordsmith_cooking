@@ -4,6 +4,7 @@ import math
 import argparse
 import time
 import os
+import re
 
 from abc import ABC, abstractmethod
 from random import shuffle
@@ -184,7 +185,16 @@ class AmericanCrossword(Crossword):
     
     def __str__(self):
         self.__generate_grid_from_slots()
-        return '\n'.join(' '.join([letter for letter in row]) for row in self.grid)
+
+        # Customizing to accommodate two-square rebuses
+        def sanitize(inp):
+            nostars = re.sub("\*", "", inp)
+            if len(nostars) == 1:
+                return nostars + " "
+            else:
+                return inp
+
+        return '\n'.join(' '.join([sanitize(row[i] + row[i+int(len(row)/2)]) for i in range(int(len(row)/2))]) for row in self.grid)
     
     def put_block(self, row, col):
         """Places block in certain square"""
@@ -209,13 +219,6 @@ class AmericanCrossword(Crossword):
         
         self.words[slot] = word
 
-        #for slot in self.slots:
-        #    print(slot)
-        #print("NOW WORDS")
-        #print(self.words)
-        #for word in self.words:
-        #    print(word)
-        #print("*********")
 
     def __generate_slots_from_grid(self):
         self.clear()
